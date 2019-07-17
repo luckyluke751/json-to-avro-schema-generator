@@ -27,7 +27,8 @@ public class AcroConverterTest {
 
     @Test
     public void validSchemShouldHaveValidNameSpaceNameAndRecord() throws IOException {
-        JsonNode jsonNode = mapper.readTree(converter.convert(TestHelper.getJson()));
+        String[] input = {TestHelper.getJson()};
+        JsonNode jsonNode = mapper.readTree(converter.convert(input));
         Assert.assertEquals("com.sgmarghade.test",jsonNode.at("/namespace").asText());
         Assert.assertEquals("outer_record",jsonNode.at("/name").asText());
         Assert.assertEquals("record",jsonNode.at("/type").asText());
@@ -36,14 +37,24 @@ public class AcroConverterTest {
 
     @Test
     public void validSchemaShouldHaveRecordType() throws IOException {
-        JsonNode jsonNode = mapper.readTree(converter.convert(TestHelper.getJson()));
+        String[] input = {TestHelper.getJson()};
+        JsonNode jsonNode = mapper.readTree(converter.convert(input));
+        ArrayNode arrayNode = (ArrayNode) jsonNode.at("/fields");
+        Assert.assertEquals("record",arrayNode.get(0).at("/type/type").asText());
+    }
+
+    @Test
+    public void doublearguments() throws IOException {
+        String[] input = {TestHelper.getJson_1(), TestHelper.getJson_2()};
+        JsonNode jsonNode = mapper.readTree(converter.convert(input));
         ArrayNode arrayNode = (ArrayNode) jsonNode.at("/fields");
         Assert.assertEquals("record",arrayNode.get(0).at("/type/type").asText());
     }
 
     @Test
     public void jsonWithNullValue() throws IOException {
-        String schema = converter.convert(TestHelper.getJsonWithNullField());
+        String[] input = {TestHelper.getJsonWithNullField()};
+        String schema = converter.convert(input);
         Assert.assertEquals(true, converter.validate(schema,TestHelper.getJsonWithNullField()));
 
         final JsonNode schemaTree = mapper.readTree(schema);
@@ -55,7 +66,8 @@ public class AcroConverterTest {
 
     @Test
     public void jsonWithBooleanValue() throws IOException {
-        String schema = converter.convert(TestHelper.getJsonWithBooleanField());
+        String[] input = {TestHelper.getJsonWithBooleanField()};
+        String schema = converter.convert(input);
         Assert.assertEquals(true, converter.validate(schema,TestHelper.getJsonWithBooleanField()));
 
         final JsonNode schemaTree = mapper.readTree(schema);
@@ -66,12 +78,14 @@ public class AcroConverterTest {
 
     @Test(expected = RuntimeException.class)
     public void jsonWithEmptyArray() throws IOException {
-        converter.convert(TestHelper.getJsonWithEmptyArray());
+        String[] input = {TestHelper.getJsonWithEmptyArray()};
+        converter.convert(input);
     }
 
     @Test
     public void generatedSchemaShouldVerifyInputJson() throws IOException {
-        String schema = converter.convert(TestHelper.getJson());
+        String[] input = {TestHelper.getJson()};
+        String schema = converter.convert(input);
         Assert.assertEquals(true, converter.validate(schema,TestHelper.getJson()));
 
     }

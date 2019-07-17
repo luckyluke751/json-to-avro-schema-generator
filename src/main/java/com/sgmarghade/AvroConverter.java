@@ -70,6 +70,8 @@ public class AvroConverter {
      * @return avro schema json
      * @throws IOException
      */
+
+    /** OLD
     public String convert(final String json) throws IOException {
         final JsonNode jsonNode = mapper.readTree(json);
         final ObjectNode finalSchema = mapper.createObjectNode();
@@ -77,6 +79,26 @@ public class AvroConverter {
         finalSchema.put(NAME, "outer_record");
         finalSchema.put(TYPE, RECORD);
         finalSchema.set(FIELDS, getFields(jsonNode));
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(finalSchema);
+    }
+    */
+    public String convert(final String[] args) throws IOException {
+
+        String json="";
+        for (int i=0; i<args.length; i++){
+            json = json + args[i];
+        }
+        //System.out.println("-------------------------------------------------");
+        //System.out.println(json);
+
+
+        final JsonNode jsonNode = mapper.readTree(json);
+        final ObjectNode finalSchema = mapper.createObjectNode();
+        finalSchema.put("namespace", "com.sgmarghade.test");
+        finalSchema.put(NAME, "outer_record");
+        finalSchema.put(TYPE, RECORD);
+        finalSchema.set(FIELDS, getFields(jsonNode));
+        //System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(finalSchema));
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(finalSchema);
     }
 
@@ -121,6 +143,7 @@ public class AvroConverter {
                     } else {
                         objectNode.set(TYPE, mapper.createObjectNode().put(TYPE, ARRAY).set(ITEMS, mapper.createObjectNode()
                                 .put(TYPE, RECORD).put(NAME, generateRandomNumber(map)).set(FIELDS, getFields(element))));
+			fields.add(objectNode);
                     }
                     //fields.add(objectNode);
                     break;
@@ -159,6 +182,6 @@ public class AvroConverter {
      * @return random
      */
     private String generateRandomNumber(Map.Entry<String, JsonNode> map) {
-        return (map.getKey() + "_" + new Random().nextInt(100));
+        return (map.getKey() + "_" + new Random().nextInt(100000));
     }
 }
